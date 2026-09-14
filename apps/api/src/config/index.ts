@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load .env from apps/api or project root
+// Load .env từ apps/api
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/api/.env') });
 dotenv.config();
-dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 export const config = {
   port: parseInt(process.env.PORT || '3000', 10),

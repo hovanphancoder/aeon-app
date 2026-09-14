@@ -48,7 +48,27 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Phục vụ tệp tĩnh (hình ảnh bill đã tải lên)
 app.use('/uploads', express.static(config.storage.localPath));
 
-// Healthcheck endpoint
+// Healthcheck & Root endpoints
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    message: '🎉 AEON Hải Dương API Server đang hoạt động tốt!',
+    customerWeb: 'http://localhost:5173',
+    adminWeb: 'http://localhost:5174',
+    endpoints: {
+      health: '/api/health',
+      customerApi: '/api/...',
+      adminApi: '/api/admin/...',
+    },
+  });
+});
+
+app.get('/api', (_req: Request, res: Response) => {
+  res.status(200).json({
+    message: 'AEON Booking API Base Endpoint',
+    health: '/api/health',
+  });
+});
+
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
