@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* Hiệu ứng kính mờ (Glassmorphism) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Nút bấm hiệu ứng nhấn */
+.btn-active-scale {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.btn-active-scale:active {
+  transform: scale(0.97);
+}
+
+/* Scrollbar ẩn tinh tế trên mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,204 @@
+// ==========================================
+// PRISMA SCHEMA - AEON BOOKING SYSTEM
+// ==========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum MonthStatus {
+  ACTIVE
+  COMING_SOON
+  INACTIVE
+}
+
+enum ActivityStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BillStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AdminRole {
+  super_admin
+  admin
+}
+
+enum AdminStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// ----------------------------------------
+// 1. CUSTOMERS
+// ----------------------------------------
+model Customer {
+  id              String            @id @default(uuid())
+  name            String
+  phone           String            @unique
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  
+  sessions        CustomerSession[]
+  billSubmissions BillSubmission[]
+
+  @@map("customers")
+}
+
+// ----------------------------------------
+// 2. CUSTOMER SESSIONS (24h REMEMBER)
+// ----------------------------------------
+model CustomerSession {
+  id          String   @id @default(uuid())
+  customerId  String   @map("customer_id")
+  tokenHash   String   @map("token_hash")
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@map("customer_sessions")
+}
+
+// ----------------------------------------
+// 3. OTP REQUESTS
+// ----------------------------------------
+model OtpRequest {
+  id         String    @id @default(uuid())
+  phone      String
+  otpHash    String    @map("otp_hash")
+  expiresAt  DateTime  @map("expires_at")
+  verifiedAt DateTime? @map("verified_at")
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([phone])
+  @@map("otp_requests")
+}
+
+// ----------------------------------------
+// 4. MONTHS
+// ----------------------------------------
+model Month {
+  id              String           @id @default(uuid())
+  name            String
+  slug            String           @unique
+  status          MonthStatus      @default(COMING_SOON)
+  startDate       DateTime?        @map("start_date")
+  endDate         DateTime?        @map("end_date")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  activities      Activity[]
+  billSubmissions BillSubmission[]
+
+  @@map("months")
+}
+
+// ----------------------------------------
+// 5. ACTIVITIES
+// ----------------------------------------
+model Activity {
+  id              String           @id @default(uuid())
+  monthId         String           @map("month_id")
+  name            String
+  slug            String
+  logo            String?
+  banner          String?
+  description     String           @db.Text
+  rules           String?          @db.Text
+  status          ActivityStatus   @default(ACTIVE)
+  startDate       DateTime?        @map("start_date")
+  endDate         DateTime?        @map("end_date")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  month           Month            @relation(fields: [monthId], references: [id], onDelete: Cascade)
+  billSubmissions BillSubmission[]
+
+  @@map("activities")
+}
+
+// ----------------------------------------
+// 6. BILL SUBMISSIONS
+// ----------------------------------------
+model BillSubmission {
+  id           String     @id @default(uuid())
+  customerId   String     @map("customer_id")
+  monthId      String     @map("month_id")
+  activityId   String     @map("activity_id")
+  billImage    String     @map("bill_image")
+  status       BillStatus @default(pending)
+  adminNote    String?    @map("admin_note") @db.Text
+  submittedAt  DateTime   @default(now()) @map("submitted_at")
+  reviewedAt   DateTime?  @map("reviewed_at")
+  reviewedBy   String?    @map("reviewed_by")
+
+  customer     Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  month        Month      @relation(fields: [monthId], references: [id], onDelete: Cascade)
+  activity     Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  reviewer     Admin?     @relation(fields: [reviewedBy], references: [id])
+
+  @@index([customerId])
+  @@index([status])
+  @@map("bill_submissions")
+}
+
+// ----------------------------------------
+// 7. ADMINS
+// ----------------------------------------
+model Admin {
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  passwordHash    String           @map("password_hash")
+  role            AdminRole        @default(admin)
+  status          AdminStatus      @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  reviews         BillSubmission[]
+  logs            AdminLog[]
+
+  @@map("admins")
+}
+
+// ----------------------------------------
+// 8. ADMIN LOGS
+// ----------------------------------------
+model AdminLog {
+  id         String   @id @default(uuid())
+  adminId    String   @map("admin_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  metadata   String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  admin      Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("admin_logs")
+}
+
+// ----------------------------------------
+// 9. SYSTEM SETTINGS (Thể Lệ, Cấu hình)
+// ----------------------------------------
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
