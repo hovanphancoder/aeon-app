@@ -1,6 +1,6 @@
 import React from 'react';
-import { ArrowLeft, Clock, Sparkles } from 'lucide-react';
-import { Header } from '../components/Header';
+import { ArrowLeft } from 'lucide-react';
+import { AeonLogo } from '../components/AeonLogo';
 
 interface ComingSoonScreenProps {
   monthName: string;
@@ -11,70 +11,71 @@ interface ComingSoonScreenProps {
 export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
   monthName,
   onBack,
-  onOpenRules,
+  onOpenRules: _onOpenRules,
 }) => {
-  return (
-    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent">
-      <div>
-        <Header onOpenRules={onOpenRules} title="Chương Trình Sắp Diễn Ra" />
+  const isMonth12 = monthName.includes('12');
+  const titleColor = isMonth12 ? '#F58220' : '#009846';
+  const shadowColor = isMonth12 ? '#B35400' : '#004D26';
 
-        <div className="p-4 space-y-6">
+  return (
+    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent px-5 py-4 pb-8">
+      {/* Top Header Section */}
+      <div className="pt-1">
+        <div className="flex items-center justify-between">
           <button
+            type="button"
             onClick={onBack}
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-gray-600 hover:text-aeon-primary transition-colors"
+            className="w-11 h-6 sm:w-12 sm:h-7 rounded-full bg-[#A82485] hover:bg-[#8E1C70] text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+            title="Quay lại chọn tháng"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Quay lại chọn tháng khác</span>
+            <ArrowLeft className="w-4 h-4 stroke-[3]" />
           </button>
 
-          {/* Coming Soon Showcase Card */}
-          <div className="bg-white rounded-3xl p-8 shadow-card border border-rose-100/70 text-center space-y-5">
-            <div className="relative mx-auto w-24 h-24">
-              <div className="absolute inset-0 bg-amber-100/80 rounded-full animate-ping opacity-25"></div>
-              <div className="relative w-24 h-24 bg-gradient-to-tr from-amber-400 to-amber-500 rounded-full flex items-center justify-center text-white shadow-lg mx-auto">
-                <Clock className="w-12 h-12" />
-              </div>
-            </div>
+          {/* Logo AEON Hải Dương chính thức */}
+          <AeonLogo className="h-7 sm:h-8 w-auto object-contain" />
 
-            <div className="space-y-2">
-              <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 text-xs font-extrabold rounded-full tracking-wider">
-                COMING SOON
-              </span>
-              <h1 className="text-2xl font-black text-gray-900">
-                {monthName}
-              </h1>
-              <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                Các hoạt động workshop và quà tặng đặc sắc của{' '}
-                <strong className="text-aeon-primary font-bold">{monthName}</strong>{' '}
-                đang được chuẩn bị và sẽ sớm ra mắt quý khách!
-              </p>
-            </div>
-
-            <div className="p-4 bg-rose-50/70 rounded-2xl border border-rose-100 text-left space-y-2">
-              <div className="flex items-center space-x-2 text-xs font-bold text-aeon-primary">
-                <Sparkles className="w-4 h-4" />
-                <span>Bật mí sắp tới:</span>
-              </div>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Nhiều hoạt động hấp dẫn và quà tặng bất ngờ đang chờ đón quý khách tại AEON Hải Dương. Vui lòng quay lại trong tháng hoặc tham gia tháng đang diễn ra nhé!
-              </p>
-            </div>
-
-            <button
-              onClick={onBack}
-              className="w-full py-3.5 bg-aeon-primary hover:bg-aeon-dark text-white font-bold rounded-2xl shadow-aeon btn-active-scale transition-all"
-            >
-              Xem Tháng Đang Diễn Ra
-            </button>
-          </div>
+          <div className="w-11" /> {/* Spacer cân xứng */}
         </div>
       </div>
 
-      <div className="p-4 text-center">
-        <p className="text-[11px] text-gray-400">
-          Theo dõi fanpage AEON Hải Dương để nhận thông báo mới nhất!
-        </p>
+      {/* Center Section: Badge Tháng + Chữ 3D COMING SOON! Chuẩn mẫu */}
+      <div className="my-auto flex flex-col items-center justify-center text-center px-4 space-y-6">
+        {/* Huy hiệu viên thuốc hiển thị Tên Tháng */}
+        <div
+          className="inline-block bg-white px-10 py-2 rounded-full shadow-md tracking-wider uppercase border-[2.5px]"
+          style={{
+            borderColor: titleColor,
+            color: titleColor,
+          }}
+        >
+          <span className="text-xl sm:text-2xl font-black">{monthName}</span>
+        </div>
+
+        {/* Chữ 3D nghệ thuật COMING SOON! nổi bật giữa bầu trời */}
+        <div
+          className="text-5xl sm:text-6xl font-black tracking-wider leading-[0.95] text-center select-none"
+          style={{
+            color: titleColor,
+            filter: 'drop-shadow(0 5px 0 rgba(0,0,0,0.15))',
+            textShadow: `
+              -3px -3px 0 #ffffff,
+               3px -3px 0 #ffffff,
+              -3px  3px 0 #ffffff,
+               3px  3px 0 #ffffff,
+              -3px  0px 0 #ffffff,
+               3px  0px 0 #ffffff,
+               0px -3px 0 #ffffff,
+               0px  3px 0 #ffffff,
+               0px  5px 0 ${shadowColor}
+            `,
+          }}
+        >
+          COMING<br />SOON!
+        </div>
       </div>
+
+      {/* Khoảng trống phía dưới để hình nền hoa hướng dương và bóng bay hiển thị trọn vẹn */}
+      <div className="h-10 pointer-events-none" />
     </div>
   );
 };

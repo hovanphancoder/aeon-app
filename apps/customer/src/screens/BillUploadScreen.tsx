@@ -4,10 +4,10 @@ import {
   RefreshCw,
   Upload,
   AlertCircle,
-  CheckCircle2,
   CameraOff,
   SwitchCamera,
   RotateCw,
+  Camera,
 } from 'lucide-react';
 import { api } from '../api/client';
 import { ActivityItem } from './ActivitySelectionScreen';
@@ -225,64 +225,63 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
   };
 
   const titleLines = formatTitle(activity.name);
-
   return (
     <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent p-4 pb-6">
       {/* Hidden canvas để chụp frame từ video */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Top Section */}
-      <div className="space-y-3 sm:space-y-4">
-        {/* Row 1: Back button + LOGO Badge */}
+      <div className="flex-1 flex flex-col justify-between">
+        {/* Row 1: Back button tím hồng + Logo AEON ở giữa */}
         <div className="flex items-center justify-between pt-1">
           <button
             onClick={() => {
               stopCamera();
               onBack();
             }}
-            className="w-14 h-8 rounded-full bg-[#8E24AA] hover:bg-[#7B1FA2] text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+            className="w-11 h-6 sm:w-12 sm:h-7 rounded-full bg-[#A82485] hover:bg-[#8E1C70] text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
             title="Quay lại"
           >
-            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+            <ArrowLeft className="w-4 h-4 stroke-[3]" />
           </button>
 
           {/* Logo AEON Hải Dương chính thức */}
-          <AeonLogo className="h-9 sm:h-11 w-auto object-contain" />
+          <AeonLogo className="h-7 sm:h-8 w-auto object-contain" />
 
-          <div className="w-14" />
+          <div className="w-11" />
         </div>
 
-        {/* Row 2: Tên hoạt động */}
+        {/* Row 2: Tên hoạt động & Thời gian chương trình chuẩn ảnh mẫu 1 */}
         <div className="text-center pt-1">
-          <div className="inline-block bg-[#FF4081] text-black font-black text-base sm:text-lg px-8 py-2 rounded-3xl shadow-sm border border-pink-400 leading-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-[#E60067] tracking-wider uppercase leading-tight">
             {titleLines.map((line, idx) => (
               <div key={idx}>{line}</div>
             ))}
-          </div>
+          </h1>
 
-          {/* Hướng dẫn chụp ảnh trực tiếp */}
-          <p className="text-xs text-gray-800 font-semibold tracking-normal mt-2">
-            Đưa hóa đơn vào khung và chụp trực tiếp
-          </p>
+          {/* Sub-badge thời gian vàng nghệ */}
+          <div className="inline-block bg-[#FFE600] text-[#002D5A] font-extrabold text-[9px] sm:text-[10px] px-3.5 py-0.5 rounded-full border border-amber-300 shadow-sm uppercase tracking-wide mt-1">
+            THỜI GIAN CHƯƠNG TRÌNH: 18 - 20.10.2026
+          </div>
         </div>
 
         {/* Hiển thị thông báo lỗi nếu có */}
         {cameraError && (
-          <div className="p-3 bg-red-100 border border-red-300 rounded-xl flex items-start space-x-2 text-xs text-red-800 animate-fade-in mx-auto max-w-[320px]">
+          <div className="p-2.5 bg-red-100 border border-red-300 rounded-xl flex items-start space-x-2 text-xs text-red-800 animate-fade-in mx-auto max-w-[280px]">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{cameraError}</span>
           </div>
         )}
 
-        {/* Center: KHUNG CAMERA THỰC TẾ (Viền đen chuẩn theo bản vẽ) */}
-        <div className="pt-1 flex justify-center">
+        {/* Center: KHUNG CAMERA VIỀN HỒNG BO GÓC TRÒN CHUẨN ẢNH MẪU 1 */}
+        <div className="pt-1 flex flex-col items-center">
           <div
             onClick={() => {
               if (cameraActive && !previewUrl) {
                 capturePhoto();
               }
             }}
-            className="w-[92%] max-w-[310px] h-[360px] sm:h-[390px] border-[2.5px] border-black bg-black relative flex flex-col items-center justify-center overflow-hidden shadow-inner cursor-pointer"
+            className="w-[86%] max-w-[280px] h-[330px] sm:h-[350px] border-2 border-[#E60067] rounded-3xl bg-white relative flex flex-col items-center justify-center overflow-hidden shadow-md cursor-pointer"
           >
             {/* 1. MÀN HÌNH XEM TRƯỚC ẢNH ĐÃ CHỤP */}
             {previewUrl ? (
@@ -300,9 +299,9 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
                     e.stopPropagation();
                     handleRetake();
                   }}
-                  className="absolute top-2.5 right-2.5 px-3 py-1.5 bg-black/80 hover:bg-black text-white text-xs font-bold rounded-full flex items-center space-x-1 shadow-md border border-white/20 active:scale-95 transition-all"
+                  className="absolute top-2.5 right-2.5 px-3 py-1 bg-black/80 hover:bg-black text-white text-[11px] font-bold rounded-full flex items-center space-x-1 shadow border border-white/20 active:scale-95 transition-all"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3 h-3" />
                   <span>Chụp lại</span>
                 </button>
 
@@ -315,7 +314,7 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
               </div>
             ) : (
               /* 2. KHUNG LIVE CAMERA THỰC TẾ */
-              <div className="relative w-full h-full flex items-center justify-center bg-black">
+              <div className="relative w-full h-full flex items-center justify-center bg-white">
                 {/* Thẻ Video phát luồng camera thực tế */}
                 <video
                   ref={videoRef}
@@ -340,56 +339,53 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
                 {/* TRẠNG THÁI: CAMERA ĐANG HOẠT ĐỘNG */}
                 {cameraActive && (
                   <>
-                    {/* 4 góc ngắm canh khung hóa đơn */}
-                    <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-white pointer-events-none" />
-                    <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-white pointer-events-none" />
-                    <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-white pointer-events-none" />
-                    <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-white pointer-events-none" />
-
-                    {/* Vạch căn chỉnh tài liệu mờ ở giữa */}
-                    <div className="absolute inset-x-6 inset-y-10 border border-dashed border-white/40 rounded pointer-events-none" />
-
-                    {/* Nút chuyển đổi Camera trước / sau (nếu thiết bị có nhiều camera) */}
+                    {/* Nút chuyển đổi Camera trước / sau (nếu có) */}
                     {hasMultipleCameras && (
                       <button
                         type="button"
                         onClick={toggleCameraFacing}
-                        className="absolute top-2.5 left-2.5 z-10 p-2 bg-black/60 hover:bg-black text-white rounded-full backdrop-blur-sm active:scale-90 transition-all border border-white/20"
+                        className="absolute top-2.5 left-2.5 z-10 p-2 bg-black/50 hover:bg-black text-white rounded-full backdrop-blur-sm active:scale-90 transition-all border border-white/20"
                         title="Đổi camera trước / sau"
                       >
                         <SwitchCamera className="w-4 h-4" />
                       </button>
                     )}
 
-                    {/* Hướng dẫn bấm vào khung */}
-                    <div className="absolute bottom-2.5 left-0 right-0 text-center pointer-events-none">
-                      <span className="bg-black/70 text-white text-[11px] font-medium px-3 py-1 rounded-full backdrop-blur-sm border border-white/20">
-                        ● Chạm vào đây hoặc nút máy ảnh để chụp
-                      </span>
-                    </div>
+                    {/* Nút Bấm Máy Ảnh Tròn Màu Hồng Viền Trắng Đặt Ngay Đáy Khung Chuẩn Mẫu 1 */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        capturePhoto();
+                      }}
+                      className="absolute bottom-3 w-12 h-12 rounded-full bg-gradient-to-b from-[#FF2D78] via-[#E60067] to-[#C00054] border-2 border-white shadow-lg flex items-center justify-center text-white active:scale-90 hover:scale-105 transition-all z-20"
+                      title="Chụp ảnh hóa đơn"
+                    >
+                      <Camera className="w-6 h-6 stroke-[2.2]" />
+                    </button>
                   </>
                 )}
 
                 {/* TRẠNG THÁI: ĐANG KẾT NỐI CAMERA */}
                 {cameraLoading && !cameraError && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#C2D1DD] p-4 text-center space-y-3 z-10">
-                    <RotateCw className="w-8 h-8 text-gray-700 animate-spin" />
-                    <p className="text-xs font-bold text-gray-800">
-                      Đang kết nối camera thực tế...
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-rose-50/40 p-4 text-center space-y-2 z-10">
+                    <RotateCw className="w-7 h-7 text-[#E60067] animate-spin" />
+                    <p className="text-xs font-bold text-gray-700">
+                      Đang kết nối camera...
                     </p>
                   </div>
                 )}
 
                 {/* TRẠNG THÁI: LỖI / CHƯA CẤP QUYỀN CAMERA */}
                 {!cameraLoading && !cameraActive && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#C2D1DD] p-4 text-center space-y-3 z-10">
-                    <CameraOff className="w-10 h-10 text-gray-600" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-rose-50/60 p-4 text-center space-y-2.5 z-10">
+                    <CameraOff className="w-8 h-8 text-gray-500" />
                     <div className="space-y-1">
-                      <p className="text-xs font-black text-black uppercase">
-                        Chưa kết nối được camera
+                      <p className="text-xs font-black text-[#E60067] uppercase">
+                        Chưa kết nối camera
                       </p>
-                      <p className="text-[11px] text-gray-700 leading-tight">
-                        Vui lòng cho phép quyền truy cập máy ảnh để chụp trực tiếp hóa đơn (không dùng ảnh tải lên).
+                      <p className="text-[10px] text-gray-600 leading-tight">
+                        Vui lòng cho phép quyền Camera để chụp trực tiếp hóa đơn.
                       </p>
                     </div>
                     <button
@@ -398,7 +394,7 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
                         e.stopPropagation();
                         startCamera(facingMode);
                       }}
-                      className="px-4 py-1.5 bg-black text-white text-xs font-bold rounded-full active:scale-95 transition-all shadow"
+                      className="px-3.5 py-1 bg-[#E60067] text-white text-[11px] font-bold rounded-full active:scale-95 transition-all shadow"
                     >
                       Bật lại camera
                     </button>
@@ -407,48 +403,19 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
               </div>
             )}
           </div>
-        </div>
 
-        {/* NÚT BẤM CHỤP ẢNH & XÁC NHẬN */}
-        <div className="flex flex-col items-center justify-center pt-1 space-y-3">
-          {/* Nút biểu tượng Máy Ảnh (Chỉ hiện khi chưa chụp hoặc đang bật camera) */}
-          {!previewUrl && (
-            <button
-              type="button"
-              onClick={capturePhoto}
-              disabled={!cameraActive}
-              className="w-16 h-12 flex items-center justify-center text-black hover:opacity-80 active:scale-90 transition-all disabled:opacity-40"
-              title="Bấm để chụp ảnh hóa đơn"
-            >
-              <svg
-                viewBox="0 0 48 40"
-                className="w-12 h-10 stroke-black fill-none stroke-[2.5]"
-              >
-                {/* Thân máy ảnh */}
-                <rect x="3" y="10" width="42" height="27" rx="5" />
-                {/* Vòng ống kính ở giữa */}
-                <circle cx="24" cy="23.5" r="7.5" />
-                {/* Tâm ống kính */}
-                <circle cx="24" cy="23.5" r="3" fill="currentColor" />
-                {/* Nút bấm / gờ phía trên */}
-                <path d="M15 10 L18 5 L30 5 L33 10 Z" />
-                {/* Đèn báo nhỏ */}
-                <circle cx="37" cy="16" r="1.5" fill="currentColor" />
-              </svg>
-            </button>
-          )}
+          {/* Dòng ghi chú bên dưới khung ảnh chuẩn mẫu 1 */}
+          <p className="text-[9px] sm:text-[10px] font-bold text-black text-center max-w-[260px] mx-auto mt-2 leading-tight">
+            Vui lòng tải lên ảnh hóa đơn. Đảm bảo ảnh chụp rõ nét, đầy đủ thông tin và tổng tiền
+          </p>
 
           {/* Nút Xác Nhận Nộp Hóa Đơn khi đã chụp */}
           {previewUrl && (
-            <div className="w-[92%] max-w-[310px] space-y-2 animate-fade-in">
-              <div className="flex items-center justify-center space-x-1.5 text-xs text-emerald-900 font-bold">
-                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                <span>Hóa đơn đã chụp sẵn sàng gửi duyệt!</span>
-              </div>
+            <div className="w-[86%] max-w-[280px] mt-2 animate-fade-in">
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full py-3 bg-[#059669] hover:bg-[#047857] text-white font-black text-sm rounded-2xl shadow-md flex items-center justify-center space-x-2 active:scale-95 transition-all disabled:opacity-60"
+                className="w-full py-2.5 bg-gradient-to-b from-[#FF2D78] via-[#E60067] to-[#C00054] hover:brightness-105 text-white font-black text-xs sm:text-sm rounded-full shadow-lg border-2 border-white/60 flex items-center justify-center space-x-2 active:scale-95 transition-all disabled:opacity-60 uppercase tracking-wider"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -462,17 +429,17 @@ export const BillUploadScreen: React.FC<BillUploadScreenProps> = ({
             </div>
           )}
         </div>
-      </div>
 
-      {/* Bottom Section: Nút THỂ LỆ */}
-      <div className="pt-3 text-center">
-        <button
-          type="button"
-          onClick={onOpenRules}
-          className="px-14 py-2 bg-[#005E8A] hover:bg-[#004768] text-white font-extrabold text-sm rounded-full shadow-md active:scale-95 transition-all border border-sky-900/40"
-        >
-          thể lệ
-        </button>
+        {/* Bottom Section: Nút THỂ LỆ Màu Xanh Lá Cây Viên Thuốc Chuẩn Mẫu 1 */}
+        <div className="pt-2 text-center">
+          <button
+            type="button"
+            onClick={onOpenRules}
+            className="px-12 py-1.5 bg-gradient-to-b from-[#8CD825] via-[#70C922] to-[#4F9E13] hover:brightness-105 active:scale-95 text-white font-black text-xs sm:text-sm rounded-full shadow-md border border-white/60 tracking-wider uppercase transition-all"
+          >
+            THỂ LỆ
+          </button>
+        </div>
       </div>
     </div>
   );
