@@ -8,11 +8,15 @@ import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
-// Đảm bảo thư mục lưu trữ uploads tồn tại
-if (config.storage.provider === 'local') {
-  const uploadDir = path.resolve(config.storage.localPath, 'bills');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+// Đảm bảo thư mục lưu trữ uploads tồn tại (chỉ chạy khi local, tránh lỗi read-only filesystem trên Vercel)
+if (!process.env.VERCEL && config.storage.provider === 'local') {
+  try {
+    const uploadDir = path.resolve(config.storage.localPath, 'bills');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[Storage] Không thể tạo thư mục upload local:', err);
   }
 }
 
@@ -100,22 +104,24 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-// Khởi động server
-const server = app.listen(config.port, '0.0.0.0', () => {
-  console.log(`\n🚀 ========================================================`);
-  console.log(`   AEON Booking API đang chạy tại: http://localhost:${config.port}`);
-  console.log(`   Môi trường: ${config.nodeEnv}`);
-  console.log(`   ZNS OTP Provider: ${config.zns.provider}`);
-  console.log(`   Storage Provider: ${config.storage.provider}`);
-  console.log(`========================================================\n`);
-});
-
-// Xử lý tắt ứng dụng an toàn
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: Closing HTTP server');
-  server.close(() => {
-    console.log('HTTP server closed');
+// Khởi động server (chỉ chạy khi ở local dev / standalone server, tránh lỗi cổng trên Vercel Serverless)
+if (!process.env.VERCEL) {
+  const server = app.listen(config.port, '0.0.0.0', () => {
+    console.log(`\n🚀 ========================================================`);
+    console.log(`   AEON Booking API đang chạy tại: http://localhost:${config.port}`);
+    console.log(`   Môi trường: ${config.nodeEnv}`);
+    console.log(`   ZNS OTP Provider: ${config.zns.provider}`);
+    console.log(`   Storage Provider: ${config.storage.provider}`);
+    console.log(`========================================================\n`);
   });
-});
+
+  // Xử lý tắt ứng dụng an toàn
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: Closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+    });
+  });
+}
 
 export default app;
