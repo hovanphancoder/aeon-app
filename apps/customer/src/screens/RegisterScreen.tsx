@@ -9,7 +9,7 @@ interface RegisterScreenProps {
   onOpenRules: () => void;
 }
 
-export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSuccess, onOpenRules }) => {
+export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSuccess }) => {
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);

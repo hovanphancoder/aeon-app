@@ -23,7 +23,7 @@ interface MonthSelectionScreenProps {
 export const MonthSelectionScreen: React.FC<MonthSelectionScreenProps> = ({
   onSelectActiveMonth,
   onSelectComingSoonMonth,
-  onOpenRules,
+  // onOpenRules,
   onBack,
 }) => {
   const [months, setMonths] = useState<MonthItem[]>([]);
