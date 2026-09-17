@@ -45,9 +45,12 @@ export class LocalStorageService implements IStorageService {
     // Lưu buffer vào file system
     await fs.promises.writeFile(targetPath, file.buffer);
 
-    // Nếu chạy Vercel, trả về URL tạm
+    // Nếu chạy Vercel, trả về URL đầy đủ kèm domain API để web Admin/Customer hiển thị được
     if (process.env.VERCEL) {
-      return `/uploads/bills/${filename}`;
+      const apiHost = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'https://aeon-app-api.vercel.app';
+      return `${apiHost}/uploads/bills/${filename}`;
     }
 
     return `${config.storage.publicUrl}/bills/${filename}`;
