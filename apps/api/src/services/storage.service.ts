@@ -11,8 +11,15 @@ export interface IStorageService {
 export class LocalStorageService implements IStorageService {
   private uploadDir: string;
 
+  // constructor() {
+  //   this.uploadDir = path.resolve(config.storage.localPath, 'bills');
+  //   if (!fs.existsSync(this.uploadDir)) {
+  //     fs.mkdirSync(this.uploadDir, { recursive: true });
+  //   }
+  // }
   constructor() {
-    this.uploadDir = path.resolve(config.storage.localPath, 'bills');
+    this.uploadDir = path.join('/tmp', 'uploads', 'bills');
+
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true });
     }
@@ -20,7 +27,7 @@ export class LocalStorageService implements IStorageService {
 
   async saveFile(file: Express.Multer.File): Promise<string> {
     const ext = path.extname(file.originalname).toLowerCase();
-    
+
     // Kiểm tra extension an toàn
     if (!config.storage.allowedExtensions.includes(ext)) {
       throw new Error(`Định dạng tệp không được hỗ trợ: ${ext}. Chỉ chấp nhận ảnh JPG, PNG, WEBP, HEIC.`);
