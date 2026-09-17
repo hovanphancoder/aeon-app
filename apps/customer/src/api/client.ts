@@ -1,6 +1,12 @@
 // API Client linh hoạt cho Customer Web
-// Tự động chuẩn hóa VITE_API_URL để tránh bị lặp '/api/api' hoặc thiếu '/api'
-const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+// Tự động kết nối tới https://aeon-app-api.vercel.app khi chạy trên Vercel/Cloud
+const isLocal = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
+);
+
+const defaultCustomerOrigin = isLocal ? '' : 'https://aeon-app-api.vercel.app';
+const rawApiUrl = (import.meta.env.VITE_API_URL || defaultCustomerOrigin).trim().replace(/\/+$/, '');
 const API_BASE_URL = rawApiUrl 
   ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`) 
   : '/api';

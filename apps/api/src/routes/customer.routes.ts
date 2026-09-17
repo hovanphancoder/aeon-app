@@ -5,8 +5,9 @@ import { ActivityController } from '../controllers/activity.controller';
 import { BillController } from '../controllers/bill.controller';
 import { SettingsController } from '../controllers/settings.controller';
 import { customerAuth } from '../middleware/auth.middleware';
+import { AdminController } from '../controllers/admin.controller';
 import { uploadBillMiddleware, handleUploadErrors } from '../middleware/upload.middleware';
-import { otpRateLimiter, billSubmissionLimiter } from '../middleware/rateLimit.middleware';
+import { otpRateLimiter, billSubmissionLimiter, adminLoginLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
@@ -15,6 +16,8 @@ router.post('/auth/request-otp', otpRateLimiter, AuthController.requestOtp);
 router.post('/auth/verify-otp', AuthController.verifyOtp);
 router.get('/auth/me', customerAuth, AuthController.me);
 router.post('/auth/logout', customerAuth, AuthController.logout);
+// Hỗ trợ alias đăng nhập admin nếu client gọi /api/auth/login hoặc /auth/login
+router.post('/auth/login', adminLoginLimiter, AdminController.login);
 
 // 2. Tháng & Hoạt động
 router.get('/months', MonthController.getMonths);

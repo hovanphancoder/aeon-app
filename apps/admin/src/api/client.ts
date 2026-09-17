@@ -1,6 +1,12 @@
 // API Client cho Admin Dashboard
-// Tự động chuẩn hóa VITE_API_URL để tránh bị lặp '/api/admin' hoặc thừa '/api'
-const rawAdminUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+// Tự động kết nối tới https://aeon-app-api.vercel.app khi chạy trên Vercel/Cloud
+const isLocal = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
+);
+
+const defaultAdminOrigin = isLocal ? '' : 'https://aeon-app-api.vercel.app';
+const rawAdminUrl = (import.meta.env.VITE_API_URL || defaultAdminOrigin).trim().replace(/\/+$/, '');
 const cleanAdminOrigin = rawAdminUrl.replace(/\/api\/admin$|\/api$|\/admin$/, '');
 const API_BASE_URL = cleanAdminOrigin ? `${cleanAdminOrigin}/api/admin` : '/api/admin';
 
