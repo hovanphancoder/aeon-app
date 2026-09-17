@@ -35,11 +35,17 @@ export const config = {
   
   // Storage
   storage: {
-    provider: process.env.STORAGE_PROVIDER || 'local', // 'local' | 's3'
+    provider: (process.env.STORAGE_PROVIDER || (process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local')) as 'local' | 'cloudinary' | 's3',
     localPath: process.env.STORAGE_PATH || path.resolve(__dirname, '../../uploads'),
     publicUrl: process.env.STORAGE_PUBLIC_URL || '/uploads',
     maxFileSize: 10 * 1024 * 1024, // 10MB
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/jpg'],
     allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.heic'],
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+      apiKey: process.env.CLOUDINARY_API_KEY || '',
+      apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+      folder: process.env.CLOUDINARY_FOLDER || 'aeon_bills',
+    },
   }
 };
