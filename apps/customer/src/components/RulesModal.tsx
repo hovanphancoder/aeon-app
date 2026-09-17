@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, FileText, ShieldCheck } from 'lucide-react';
+import { X, ShieldCheck } from 'lucide-react';
 import { api } from '../api/client';
 
 interface RulesModalProps {

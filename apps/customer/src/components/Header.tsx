@@ -1,6 +1,7 @@
 import React from 'react';
-import { BookOpen, User, LogOut } from 'lucide-react';
+import { BookOpen, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { AeonLogo } from './AeonLogo';
 
 interface HeaderProps {
   onOpenRules: () => void;
@@ -14,15 +15,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRules, title, showUserInfo
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-rose-100 shadow-sm px-4 py-3">
       <div className="max-w-md mx-auto flex items-center justify-between">
-        {/* Logo AEON & Badge */}
+        {/* Logo AEON & Title */}
         <div className="flex items-center space-x-2.5">
-          <div className="bg-gradient-to-r from-aeon-primary to-aeon-dark text-white px-2.5 py-1 rounded-lg font-black text-sm tracking-wider shadow-sm">
-            AEON
-          </div>
+          <AeonLogo className="h-8 w-auto object-contain" />
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-aeon-primary">
-              HẢI DƯƠNG
-            </span>
             <span className="text-[13px] font-semibold text-gray-800 leading-none">
               {title || 'Chương Trình Đổi Quà'}
             </span>

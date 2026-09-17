@@ -1,80 +1,113 @@
 import React from 'react';
-import { XCircle, BookOpen, RotateCcw, AlertTriangle } from 'lucide-react';
-import { Header } from '../components/Header';
+import { ArrowLeft, Home } from 'lucide-react';
+import { ActivityItem } from './ActivitySelectionScreen';
+import { AeonLogo } from '../components/AeonLogo';
 
 interface ResultRejectedScreenProps {
   billData: any;
+  activity?: ActivityItem | null;
   onRetry: () => void;
+  onHome: () => void;
   onOpenRules: () => void;
+  onBack?: () => void;
 }
 
 export const ResultRejectedScreen: React.FC<ResultRejectedScreenProps> = ({
   billData,
+  activity,
   onRetry,
+  onHome,
   onOpenRules,
+  onBack,
 }) => {
-  const adminNote = billData?.adminNote || 'Hóa đơn không rõ ngày giờ, bị mờ hoặc không đạt giá trị theo thể lệ.';
+  const formatTitle = (name?: string) => {
+    const raw = name || activity?.name || billData?.activity?.name || 'Nét Điệu Cho Nàng';
+    const parts = raw.trim().split(' ');
+    if (parts.length <= 2) return [raw.toUpperCase()];
+    const mid = Math.ceil(parts.length / 2);
+    return [
+      parts.slice(0, mid).join(' ').toUpperCase(),
+      parts.slice(mid).join(' ').toUpperCase(),
+    ];
+  };
+
+  const titleLines = formatTitle(activity?.name || billData?.activity?.name);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/60 via-white to-rose-50/40 flex flex-col justify-between max-w-md mx-auto">
-      <div>
-        <Header onOpenRules={onOpenRules} title="Thông Báo Kết Quả" />
+    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent p-6 pb-8">
+      {/* Top Header Section */}
+      <div className="space-y-4">
+        {/* Row 1: Back arrow + LOGO Badge + Home icon */}
+        <div className="flex items-center justify-between pt-2">
+          {/* Nút quay lại */}
+          <button
+            type="button"
+            onClick={onBack || onRetry}
+            className="w-10 h-10 flex items-center justify-center text-gray-900 hover:text-black active:scale-95 transition-all"
+            title="Chụp lại hóa đơn"
+          >
+            <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
+          </button>
 
-        <div className="p-4 space-y-6 pt-4">
-          {/* Main Alert Card */}
-          <div className="rounded-3xl bg-white p-6 text-center shadow-card border border-red-100 space-y-4">
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
-              <XCircle className="w-10 h-10" />
-            </div>
+          {/* Logo AEON Hải Dương chính thức */}
+          <AeonLogo className="h-9 sm:h-11 w-auto object-contain" />
 
-            <div className="space-y-2">
-              <h1 className="text-xl font-black text-gray-900 leading-tight">
-                Hóa Đơn Quý Khách Chưa Hợp Lệ
-              </h1>
-              <p className="text-xs text-gray-600 leading-relaxed font-normal">
-                Vui lòng xem lại thể lệ hoặc liên hệ với nhân viên PG tại quầy để được hỗ trợ.
-              </p>
-            </div>
+          {/* Nút Ngôi nhà (Home) trở về trang chủ theo bản vẽ */}
+          <button
+            type="button"
+            onClick={onHome}
+            className="w-10 h-10 flex items-center justify-center text-gray-900 hover:text-black active:scale-95 transition-all"
+            title="Về trang chủ"
+          >
+            <Home className="w-7 h-7 stroke-[2.5] fill-black" />
+          </button>
+        </div>
 
-            {/* Lý do từ admin note */}
-            <div className="p-4 bg-red-50/80 rounded-2xl border border-red-200/80 text-left space-y-1">
-              <div className="flex items-center space-x-1.5 text-xs font-bold text-red-700">
-                <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
-                <span>Lý do chưa hợp lệ:</span>
-              </div>
-              <p className="text-xs text-red-900 leading-relaxed font-medium">
-                {adminNote}
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            {/* Nút THỂ LỆ theo brief */}
-            <button
-              onClick={onOpenRules}
-              className="w-full py-3.5 bg-white border-2 border-aeon-primary text-aeon-primary font-bold rounded-2xl flex items-center justify-center space-x-2 btn-active-scale transition-all hover:bg-rose-50"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>XEM LẠI THỂ LỆ CHƯƠNG TRÌNH</span>
-            </button>
-
-            {/* Nút Gửi lại hóa đơn */}
-            <button
-              onClick={onRetry}
-              className="w-full py-4 bg-gradient-to-r from-aeon-primary to-aeon-dark hover:opacity-95 text-white font-bold rounded-2xl shadow-aeon flex items-center justify-center space-x-2 btn-active-scale transition-all"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span>Chụp / Gửi Lại Hóa Đơn Khác</span>
-            </button>
+        {/* Row 2: Tên hoạt động (Huy hiệu hồng, chữ đen bo góc) */}
+        <div className="text-center pt-1">
+          <div className="inline-block bg-[#FF4081] text-black font-black text-base sm:text-lg px-8 py-2 rounded-3xl shadow-sm border border-pink-400 leading-tight">
+            {titleLines.map((line, idx) => (
+              <div key={idx}>{line}</div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="p-4 text-center">
-        <p className="text-[11px] text-gray-400">
-          Đội ngũ PG AEON Hải Dương luôn sẵn sàng hỗ trợ quý khách tại booth sự kiện!
-        </p>
+      {/* Center Content: Thông báo hóa đơn chưa hợp lệ */}
+      <div className="my-auto text-center px-4 space-y-4">
+        <div className="text-sm sm:text-base font-semibold text-gray-900 leading-relaxed max-w-[280px] mx-auto">
+          <p>Hóa đơn Quý khách chưa hợp lệ.</p>
+          <p>Vui lòng xem lại thể lệ hoặc liên</p>
+          <p>hệ với PG để được hỗ trợ</p>
+        </div>
+
+        {/* Hiển thị ghi chú của Admin nếu có */}
+        {billData?.adminNote && billData.adminNote !== 'Hóa đơn chưa hợp lệ.' && (
+          <div className="bg-white/70 backdrop-blur-sm border border-red-200 rounded-xl p-2.5 max-w-[260px] mx-auto text-xs text-red-800">
+            <span className="font-bold">Lý do từ PG:</span> {billData.adminNote}
+          </div>
+        )}
+
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={onRetry}
+            className="text-xs text-[#005E8A] font-bold underline hover:opacity-80"
+          >
+            Bấm vào đây để chụp lại hóa đơn
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Section: Nút THỂ LỆ (Pill xanh than) */}
+      <div className="text-center pt-4">
+        <button
+          type="button"
+          onClick={onOpenRules}
+          className="px-14 py-2 bg-[#005E8A] hover:bg-[#004768] text-white font-extrabold text-sm rounded-full shadow-md active:scale-95 transition-all border border-sky-900/40"
+        >
+          thể lệ
+        </button>
       </div>
     </div>
   );

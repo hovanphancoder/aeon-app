@@ -27,6 +27,13 @@ export const BillsPage: React.FC = () => {
 
   useEffect(() => {
     fetchBills();
+
+    // Tự động cập nhật hóa đơn mới nộp mỗi 3 giây
+    const interval = setInterval(() => {
+      fetchBills(false);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [page, statusFilter, monthFilter, activityFilter]);
 
   const fetchMetadata = async () => {
@@ -42,9 +49,9 @@ export const BillsPage: React.FC = () => {
     }
   };
 
-  const fetchBills = async () => {
+  const fetchBills = async (showLoadingSpinner: boolean = true) => {
     try {
-      setLoading(true);
+      if (showLoadingSpinner) setLoading(true);
       const res = await adminApi.getBills({
         page,
         limit: 15,
@@ -62,7 +69,7 @@ export const BillsPage: React.FC = () => {
     } catch (err) {
       console.error('Lỗi tải danh sách bill:', err);
     } finally {
-      setLoading(false);
+      if (showLoadingSpinner) setLoading(false);
     }
   };
 
@@ -204,7 +211,7 @@ export const BillsPage: React.FC = () => {
               <tr>
                 <th className="py-3.5 px-4">STT</th>
                 <th className="py-3.5 px-4">Thời Gian</th>
-                <th className="py-3.5 px-4">Khách Hàng (SĐT / Tên)</th>
+                <th className="py-3.5 px-4">Khách Hàng (Tên / SĐT)</th>
                 <th className="py-3.5 px-4">Tháng</th>
                 <th className="py-3.5 px-4">Hoạt Động</th>
                 <th className="py-3.5 px-4 text-center">Ảnh Bill</th>

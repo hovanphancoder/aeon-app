@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { RulesModal } from './components/RulesModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import bgImage from './assets/bg-app-19.png';
 
 // 9 Screens
 import { RegisterScreen } from './screens/RegisterScreen';
@@ -57,15 +58,22 @@ export const App: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4">
+      <div
+        className="min-h-screen flex items-center justify-center p-4 bg-cover bg-top bg-no-repeat"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      >
         <LoadingSpinner text="Đang kiểm tra phiên đăng nhập..." />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 flex flex-col justify-center">
-      {/* 1. Đăng ký Họ tên & SĐT */}
+    <div className="min-h-screen bg-gray-200 flex justify-center">
+      <main
+        className="w-full max-w-[420px] min-h-screen relative flex flex-col justify-between overflow-x-hidden shadow-2xl bg-cover bg-top bg-no-repeat"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      >
+        {/* 1. Đăng ký Họ tên & SĐT */}
       {currentScreen === 'REGISTER' && (
         <RegisterScreen
           onOpenRules={() => setIsRulesOpen(true)}
@@ -93,6 +101,7 @@ export const App: React.FC = () => {
       {currentScreen === 'MONTHS' && (
         <MonthSelectionScreen
           onOpenRules={() => setIsRulesOpen(true)}
+          onBack={() => setCurrentScreen('REGISTER')}
           onSelectActiveMonth={(month) => {
             setSelectedMonth(month);
             setCurrentScreen('ACTIVITIES');
@@ -139,10 +148,12 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 7. Chờ Duyệt (Polling) */}
+      {/* 7. Chờ Duyệt (Polling chờ Admin duyệt thực tế) */}
       {currentScreen === 'WAITING' && currentBillId && (
         <WaitingScreen
           billId={currentBillId}
+          activity={selectedActivity}
+          onBack={() => setCurrentScreen('UPLOAD')}
           onOpenRules={() => setIsRulesOpen(true)}
           onApproved={(billData) => {
             setReviewedBillData(billData);
@@ -159,7 +170,13 @@ export const App: React.FC = () => {
       {currentScreen === 'APPROVED' && (
         <ResultApprovedScreen
           billData={reviewedBillData}
+          activity={selectedActivity}
           onOpenRules={() => setIsRulesOpen(true)}
+          onBack={() => setCurrentScreen('ACTIVITIES')}
+          onHome={() => {
+            setSelectedActivity(null);
+            setCurrentScreen('MONTHS');
+          }}
           onContinueAnother={() => {
             setSelectedActivity(null);
             setCurrentScreen('ACTIVITIES');
@@ -171,15 +188,22 @@ export const App: React.FC = () => {
       {currentScreen === 'REJECTED' && (
         <ResultRejectedScreen
           billData={reviewedBillData}
+          activity={selectedActivity}
           onOpenRules={() => setIsRulesOpen(true)}
+          onBack={() => setCurrentScreen('UPLOAD')}
+          onHome={() => {
+            setSelectedActivity(null);
+            setCurrentScreen('MONTHS');
+          }}
           onRetry={() => {
             setCurrentScreen('UPLOAD');
           }}
         />
       )}
 
+      </main>
       {/* Global Rules Modal */}
       <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
-    </main>
+    </div>
   );
 };

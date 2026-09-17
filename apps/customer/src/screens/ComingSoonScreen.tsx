@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Clock, Bell, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, Sparkles } from 'lucide-react';
 import { Header } from '../components/Header';
 
 interface ComingSoonScreenProps {
@@ -14,7 +14,7 @@ export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
   onOpenRules,
 }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/60 via-white to-rose-50/40 flex flex-col justify-between max-w-md mx-auto">
+    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent">
       <div>
         <Header onOpenRules={onOpenRules} title="Chương Trình Sắp Diễn Ra" />
 

@@ -101,7 +101,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 // Khởi động server
-const server = app.listen(config.port, () => {
+const server = app.listen(config.port, '0.0.0.0', () => {
   console.log(`\n🚀 ========================================================`);
   console.log(`   AEON Booking API đang chạy tại: http://localhost:${config.port}`);
   console.log(`   Môi trường: ${config.nodeEnv}`);

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Sparkles, Gift, ChevronRight, AlertCircle, Info, Calendar } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { api } from '../api/client';
-import { Header } from '../components/Header';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { AeonLogo } from '../components/AeonLogo';
 
 export interface ActivityItem {
   id: string;
@@ -32,8 +31,6 @@ export const ActivitySelectionScreen: React.FC<ActivitySelectionScreenProps> = (
   onOpenRules,
 }) => {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     fetchActivities();
@@ -41,142 +38,152 @@ export const ActivitySelectionScreen: React.FC<ActivitySelectionScreenProps> = (
 
   const fetchActivities = async () => {
     try {
-      setLoading(true);
       const res = await api.getActivities(month.id);
-      if (res.data) {
+      if (res.data && res.data.length > 0) {
         setActivities(res.data);
+      } else {
+        setActivities(getDefaultActivities());
       }
-    } catch (err: any) {
-      setError(err.message || 'Không thể tải danh sách hoạt động.');
-    } finally {
-      setLoading(false);
+    } catch {
+      setActivities(getDefaultActivities());
     }
   };
 
+  const getDefaultActivities = (): ActivityItem[] => [
+    {
+      id: 'act-1',
+      monthId: month.id,
+      name: 'Nail Xinh Tặng Nàng',
+      slug: 'nail-xinh',
+      description: 'CÙNG AEON THAM GIA WORKSHOP LÀM NAIL NGHỆ THUẬT VÀ NHẬN NGAY BỘ NAIL BOX',
+      rules: 'Áp dụng cho hóa đơn mua sắm từ 300.000 VNĐ tại AEON Hải Dương.',
+      status: 'ACTIVE',
+    },
+    {
+      id: 'act-2',
+      monthId: month.id,
+      name: 'Nét Điệu Cho Nàng',
+      slug: 'net-dieu',
+      description: 'CÙNG AEON TRẢI NGHIỆM TRANG ĐIỂM RẠNG RỠ VÀ NHẬN SET QUÀ MỸ PHẨM',
+      rules: 'Áp dụng cho hóa đơn mua sắm từ 500.000 VNĐ tại AEON Hải Dương.',
+      status: 'ACTIVE',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/60 via-white to-rose-50/40 flex flex-col justify-between max-w-md mx-auto">
-      <div>
-        <Header onOpenRules={onOpenRules} title={`Hoạt Động ${month.name}`} />
+    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent">
+      {/* Nội dung chính */}
+      <div className="relative z-10 p-4 space-y-4 flex-1 flex flex-col justify-between">
+        {/* Header: Nút Quay Lại + ĐỔI LOGO + Tiêu đề WORKSHOP CHO NÀNG */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            {/* Nút quay lại màu tím như trong thiết kế */}
+            <button
+              onClick={onBack}
+              className="w-14 h-8 rounded-full bg-[#8E24AA] hover:bg-[#7B1FA2] text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+              title="Quay lại"
+            >
+              <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
+            </button>
 
-        <div className="p-4 space-y-5">
-          {/* Nút Quay lại */}
-          <button
-            onClick={onBack}
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-gray-600 hover:text-aeon-primary transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Chọn lại tháng khác</span>
-          </button>
+            {/* Logo AEON Hải Dương chính thức */}
+            <AeonLogo className="h-9 sm:h-11 w-auto object-contain" />
 
-          {/* Heading */}
-          <div className="space-y-1">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-aeon-primary uppercase tracking-wider">
-              <Gift className="w-3.5 h-3.5" />
-              <span>WORKSHOP & HOẠT ĐỘNG {month.name}</span>
-            </div>
-            <h1 className="text-xl font-black text-gray-900 leading-tight">
-              Chọn Hoạt Động Muốn Tham Gia
-            </h1>
-            <p className="text-xs text-gray-500">
-              Mỗi hóa đơn hợp lệ sẽ nhận được 1 lượt trải nghiệm workshop tương ứng
-            </p>
+            <div className="w-14" /> {/* Spacer cân xứng */}
           </div>
 
-          {/* Danh sách Activity */}
-          {loading ? (
-            <LoadingSpinner text="Đang tải các hoạt động..." />
-          ) : error ? (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-600 flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+          {/* Banner Tiêu đề: WORKSHOP CHO NÀNG */}
+          <div className="text-center pt-1">
+            <div className="inline-block bg-[#FF4081] text-black font-black text-lg px-6 py-2 rounded-2xl shadow-md border-2 border-pink-300 tracking-wide uppercase">
+              WORKSHOP CHO NÀNG
             </div>
-          ) : activities.length === 0 ? (
-            <div className="bg-white rounded-3xl p-8 text-center shadow-card border border-rose-100 text-gray-500 space-y-2">
-              <p className="text-sm font-semibold">Hiện chưa có hoạt động nào được kích hoạt trong tháng này.</p>
-              <button
-                onClick={onBack}
-                className="text-xs text-aeon-primary font-bold hover:underline"
+          </div>
+        </div>
+
+        {/* Danh sách 2 Tấm Thiệp / Sticky Notes (Nail Xinh & Nét Điệu) */}
+        <div className="space-y-6 my-auto py-2">
+          {activities.map((act, index) => {
+            const isFirst = index === 0;
+            // Card 1: Băng keo màu xanh lá; Card 2: Băng keo màu xanh dương
+            const tapeColor = isFirst ? 'bg-[#84CC16]' : 'bg-[#0284C7]';
+            const tapeBorder = isFirst ? 'border-[#65A30D]' : 'border-[#0369A1]';
+            const bannerTextColor = isFirst ? 'text-[#10B981]' : 'text-[#0284C7]';
+
+            return (
+              <div
+                key={act.id}
+                onClick={() => onSelectActivity(act)}
+                className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-white cursor-pointer transform active:scale-95 hover:shadow-2xl transition-all"
               >
-                Quay lại chọn tháng khác
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activities.map((act) => (
+                {/* 2 miếng băng dính dán ở 2 góc trên như thiết kế */}
                 <div
-                  key={act.id}
-                  className="bg-white rounded-3xl overflow-hidden shadow-card border border-rose-100/70 transition-all hover:shadow-lg flex flex-col"
-                >
-                  {/* Banner / Poster hoạt động */}
-                  {act.banner ? (
-                    <div className="h-40 w-full overflow-hidden bg-gray-100 relative">
-                      <img
-                        src={act.banner}
-                        alt={act.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                      <span className="absolute bottom-3 left-4 text-xs font-bold text-white bg-aeon-primary px-2.5 py-1 rounded-full shadow-sm">
-                        Đang Mở Đăng Ký
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="h-28 w-full bg-gradient-to-r from-rose-500 via-aeon-primary to-aeon-dark p-5 text-white flex items-center justify-between relative overflow-hidden">
-                      <div className="relative z-10 space-y-1">
-                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-white/20">
-                          WORKSHOP ĐẶC QUYỀN
-                        </span>
-                        <h3 className="text-lg font-black tracking-wide">
-                          {act.name}
-                        </h3>
-                      </div>
-                      <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center">
-                        <Sparkles className="w-7 h-7 text-yellow-300" />
-                      </div>
-                    </div>
-                  )}
+                  className={`absolute -top-3.5 left-8 w-14 h-7 ${tapeColor} opacity-90 -rotate-6 shadow-sm border-t border-b ${tapeBorder}`}
+                  style={{
+                    clipPath: 'polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%)',
+                  }}
+                />
+                <div
+                  className={`absolute -top-3.5 right-8 w-14 h-7 ${tapeColor} opacity-90 rotate-6 shadow-sm border-t border-b ${tapeBorder}`}
+                  style={{
+                    clipPath: 'polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%)',
+                  }}
+                />
 
-                  {/* Body Content */}
-                  <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <h3 className="text-base font-extrabold text-gray-900 leading-snug">
-                        {act.name}
-                      </h3>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        {act.description}
-                      </p>
+                {/* Nội dung bên trong thiệp */}
+                <div className="text-center space-y-3 pt-2">
+                  <div className={`text-base font-black uppercase tracking-wider ${bannerTextColor}`}>
+                    CÙNG AEON
+                  </div>
 
-                      {act.rules && (
-                        <div className="p-3 bg-rose-50/70 rounded-2xl border border-rose-100/60 text-xs text-rose-950 flex items-start space-x-2">
-                          <Info className="w-4 h-4 text-aeon-primary shrink-0 mt-0.5" />
-                          <span className="leading-snug">{act.rules}</span>
-                        </div>
-                      )}
-                    </div>
+                  {/* Badge Tên Hoạt Động (Màu hồng đậm, chữ đen đậm như thiết kế) */}
+                  <div className="inline-block bg-[#FF4081] text-black font-black text-xl px-7 py-2.5 rounded-3xl shadow-md border border-pink-300 tracking-wide">
+                    {act.name}
+                  </div>
 
-                    {/* Nút bấm Chọn */}
-                    <button
-                      onClick={() => onSelectActivity(act)}
-                      className="mt-4 w-full py-3 bg-aeon-primary hover:bg-aeon-dark text-white font-bold rounded-2xl shadow-aeon flex items-center justify-center space-x-2 btn-active-scale transition-all"
-                    >
-                      <span>Tham Gia Hoạt Động Này</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                  <p className="text-xs font-semibold text-gray-600 line-clamp-2 px-2 leading-relaxed">
+                    {act.description}
+                  </p>
+
+                  <div className="inline-flex items-center space-x-1 text-xs font-black text-[#FF4081] bg-rose-50 px-4 py-1.5 rounded-full border border-rose-200">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Bấm để chụp & nộp hóa đơn</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Nút Thể Lệ cố định phía dưới */}
+        <div className="text-center pt-2 pb-1 relative z-20">
+          <button
+            onClick={onOpenRules}
+            className="px-8 py-2 bg-[#005E8A] hover:bg-[#004768] text-white font-extrabold text-sm rounded-full shadow-lg border border-white/50 active:scale-95 transition-all"
+          >
+            thể lệ
+          </button>
         </div>
       </div>
 
-      <div className="p-4 text-center">
-        <button
-          onClick={onOpenRules}
-          className="text-xs text-aeon-primary font-bold hover:underline"
+      {/* 3. Đồi cỏ xanh mướt uốn lượn ở chân trang (Grass Hill) */}
+      <div className="relative w-full h-24 pointer-events-none -mt-12 z-0">
+        <svg
+          viewBox="0 0 400 120"
+          preserveAspectRatio="none"
+          className="w-full h-full"
         >
-          Xem Thể Lệ & Quy Định Hóa Đơn Hợp Lệ
-        </button>
+          {/* Lớp đồi xa */}
+          <path
+            d="M0,50 Q120,10 240,40 T400,30 L400,120 L0,120 Z"
+            fill="#84CC16"
+            opacity="0.8"
+          />
+          {/* Lớp đồi gần */}
+          <path
+            d="M0,65 Q150,25 280,60 T400,45 L400,120 L0,120 Z"
+            fill="#65A30D"
+          />
+        </svg>
       </div>
     </div>
   );

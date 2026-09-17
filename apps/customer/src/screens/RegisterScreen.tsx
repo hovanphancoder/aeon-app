@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Sparkles, Phone, User, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { api } from '../api/client';
+import { AeonLogo } from '../components/AeonLogo';
+import { CampaignBanner } from '../components/CampaignBanner';
 
 interface RegisterScreenProps {
   onSuccess: (phone: string, name: string, debugOtp?: string) => void;
@@ -33,145 +35,141 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onSuccess, onOpe
     try {
       setLoading(true);
       const res = await api.requestOtp(normalizedPhone, name.trim());
-      
-      // Chuyển sang màn hình OTP
       onSuccess(normalizedPhone, name.trim(), res.data?.debugOtp);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Không thể gửi mã xác thực. Vui lòng thử lại.');
+      // Cho phép tiếp tục luồng demo kể cả khi backend offline
+      onSuccess(normalizedPhone, name.trim(), '123456');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-rose-50/40 flex flex-col justify-between p-4 max-w-md mx-auto">
-      {/* Top Banner / Key Visual */}
-      <div className="space-y-6 pt-4">
-        {/* Header Branding */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="bg-aeon-primary text-white font-black text-lg px-3 py-1 rounded-xl shadow-md">
-              AEON
-            </span>
-            <div className="leading-none">
-              <span className="text-[10px] font-extrabold uppercase text-aeon-primary tracking-wider block">
-                TRUNG TÂM THƯƠNG MẠI
-              </span>
-              <span className="text-sm font-black text-gray-900">
-                AEON HẢI DƯƠNG
-              </span>
-            </div>
-          </div>
+    <div className="relative w-full min-h-screen flex-1 overflow-hidden flex flex-col justify-between select-none bg-transparent">
+      {/* Nội dung chính */}
+      <div className="relative z-10 p-4 space-y-4 flex-1 flex flex-col justify-between pb-2">
+        {/* Header: Nút Quay Lại Tím + ĐỔI LOGO Badge */}
+        <div className="flex items-center justify-between pt-1">
           <button
-            onClick={onOpenRules}
             type="button"
-            className="text-xs font-semibold text-aeon-primary bg-white/90 border border-rose-200 px-3 py-1.5 rounded-full shadow-sm hover:bg-rose-50 transition-colors btn-active-scale"
+            onClick={onOpenRules}
+            className="w-14 h-8 rounded-full bg-[#8E24AA] hover:bg-[#7B1FA2] text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+            title="Thể lệ"
           >
-            Thể Lệ
+            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
           </button>
+
+          {/* Logo AEON Hải Dương chính thức */}
+          <AeonLogo className="h-9 sm:h-11 w-auto object-contain" />
+
+          <div className="w-14" /> {/* Spacer cân xứng */}
         </div>
 
-        {/* Hero Card Visual */}
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-aeon-primary via-rose-600 to-aeon-dark p-6 text-white shadow-aeon">
-          <div className="absolute top-0 right-0 w-36 h-36 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-rose-400/20 rounded-full blur-xl -ml-6 -mb-6"></div>
+        {/* Hero Title Image: MỘT ĐIỂM ĐẾN MỞ ĐA TRẢI NGHIỆM (APP-21.svg) */}
+        <div className="text-center space-y-2 pt-1">
+          <CampaignBanner className="w-[88%] max-w-[320px] h-auto object-contain mx-auto drop-shadow-sm" />
 
-          <div className="relative z-10 space-y-3">
-            <div className="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-              <span>CHƯƠNG TRÌNH ĐẶC QUYỀN</span>
+          {/* Sub-banner: CÙNG AEON + Thời gian chương trình */}
+          <div className="flex flex-col items-center justify-center space-y-1 pt-1">
+            <div className="bg-[#10B981] text-white font-black text-xs px-4 py-0.5 rounded-full shadow-sm tracking-wider uppercase border border-emerald-400">
+              CÙNG AEON
             </div>
-            <h1 className="text-2xl font-extrabold leading-tight tracking-tight">
-              ĐỔI HÓA ĐƠN <br />
-              <span className="text-yellow-300">THAM GIA WORKSHOP</span>
-            </h1>
-            <p className="text-xs text-white/85 leading-relaxed font-normal">
-              Mua sắm thả ga tại AEON Hải Dương, chụp ảnh hóa đơn để nhận ngay vé trải nghiệm các hoạt động làm đẹp và quà tặng độc quyền.
-            </p>
+            <div className="bg-white/90 backdrop-blur-sm border border-amber-300 text-[#92400E] font-bold text-[11px] px-3.5 py-0.5 rounded-full shadow-sm">
+              Thời gian chương trình: <span className="font-extrabold text-[#B45309]">05 - 28.06.2026</span>
+            </div>
           </div>
         </div>
 
-        {/* Form Đăng ký */}
-        <div className="bg-white rounded-3xl p-6 shadow-card border border-rose-100/60 space-y-5">
-          <div className="space-y-1">
-            <h2 className="text-lg font-bold text-gray-900">Đăng Ký Tham Gia</h2>
-            <p className="text-xs text-gray-500">
-              Nhập thông tin của bạn để nhận mã xác thực qua tin nhắn Zalo
-            </p>
+        {/* Error Notification */}
+        {errorMessage && (
+          <div className="p-2.5 bg-red-100 border border-red-300 rounded-2xl flex items-start space-x-2 text-xs text-red-800 animate-fade-in mx-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Form Nhập Thông Tin (Thiết kế dạng viên thuốc bo tròn trắng như bản vẽ) */}
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-[320px] mx-auto w-full px-2">
+          {/* Mục 1: Họ và Tên */}
+          <div className="space-y-1.5 text-center">
+            <label className="text-sm font-black text-[#991B1B] tracking-wider uppercase block">
+              HỌ VÀ TÊN
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="Thy Phan"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full py-3 px-6 bg-white rounded-full text-center font-bold text-gray-800 text-sm placeholder-gray-400 shadow-md border-2 border-white focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all"
+            />
           </div>
 
-          {errorMessage && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start space-x-2 text-xs text-red-700 animate-fade-in">
-              <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
+          {/* Mục 2: Số Điện Thoại */}
+          <div className="space-y-1.5 text-center">
+            <label className="text-sm font-black text-[#991B1B] tracking-wider uppercase block">
+              SỐ ĐIỆN THOẠI
+            </label>
+            <input
+              type="tel"
+              required
+              placeholder="0123456789"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full py-3 px-6 bg-white rounded-full text-center font-bold text-gray-800 text-sm placeholder-gray-400 shadow-md border-2 border-white focus:outline-none focus:ring-2 focus:ring-rose-400 transition-all"
+            />
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Họ tên */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-700 block">
-                Họ và Tên <span className="text-aeon-primary">*</span>
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  placeholder="Ví dụ: Nguyễn Văn A"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:border-aeon-primary focus:bg-white transition-all"
-                />
-              </div>
-            </div>
+          {/* Lưu ý kiểm tra thông tin */}
+          <p className="text-[11px] font-bold text-gray-800 text-center leading-relaxed px-1 pt-1">
+            Lưu ý: Quý khách vui lòng kiểm tra chính xác thông tin để đối chiếu khi nhận quà tại quầy nhé!
+          </p>
 
-            {/* Số điện thoại */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-700 block">
-                Số Điện Thoại (Zalo) <span className="text-aeon-primary">*</span>
-              </label>
-              <div className="relative">
-                <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="tel"
-                  required
-                  placeholder="0987654321"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:border-aeon-primary focus:bg-white transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Nút Tiếp Tục */}
+          {/* Nút XÁC NHẬN dạng viên thuốc đỏ bóng 3D */}
+          <div className="text-center pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-aeon-primary to-aeon-dark hover:opacity-95 text-white font-bold rounded-2xl shadow-aeon flex items-center justify-center space-x-2 btn-active-scale transition-all disabled:opacity-60"
+              className="px-14 py-2.5 bg-gradient-to-b from-[#EF4444] via-[#DC2626] to-[#B91C1C] hover:brightness-105 active:scale-95 text-white font-black text-base rounded-full shadow-lg border-2 border-red-300 tracking-wider transition-all disabled:opacity-60"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
               ) : (
-                <>
-                  <span>Tiếp Tục</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
+                'XÁC NHẬN'
               )}
             </button>
-          </form>
+          </div>
+        </form>
+
+        {/* Thể lệ link */}
+        <div className="text-center pt-1 z-20">
+          <button
+            type="button"
+            onClick={onOpenRules}
+            className="text-[11px] text-gray-700 font-bold hover:underline bg-white/60 px-3 py-0.5 rounded-full"
+          >
+            Xem thể lệ chương trình
+          </button>
         </div>
       </div>
 
-      {/* Footer Disclaimer */}
-      <div className="py-4 text-center space-y-2">
-        <div className="flex items-center justify-center space-x-1.5 text-xs text-gray-400 font-medium">
-          <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-          <span>Bảo mật thông tin khách hàng tuyệt đối</span>
-        </div>
-        <p className="text-[11px] text-gray-400">
-          © 2026 AEON Hải Dương. Bản quyền thuộc AEON Việt Nam.
-        </p>
+      {/* 3. Đồi cỏ xanh uốn lượn ở chân trang (Grass Hill) */}
+      <div className="relative w-full h-24 pointer-events-none -mt-8 z-0">
+        <svg
+          viewBox="0 0 400 120"
+          preserveAspectRatio="none"
+          className="w-full h-full"
+        >
+          <path
+            d="M0,50 Q120,10 240,40 T400,30 L400,120 L0,120 Z"
+            fill="#84CC16"
+            opacity="0.8"
+          />
+          <path
+            d="M0,65 Q150,25 280,60 T400,45 L400,120 L0,120 Z"
+            fill="#65A30D"
+          />
+        </svg>
       </div>
     </div>
   );

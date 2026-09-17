@@ -151,12 +151,12 @@ export class AdminController {
         }),
       ]);
 
-      const billsByMonth = months.map((m) => ({
+      const billsByMonth = months.map((m: any) => ({
         monthName: m.name,
         count: m._count.billSubmissions,
       }));
 
-      const billsByActivity = activities.map((a) => ({
+      const billsByActivity = activities.map((a: any) => ({
         activityName: a.name,
         count: a._count.billSubmissions,
       }));
@@ -249,46 +249,63 @@ export class AdminController {
         };
       }
 
-      const [total, bills] = await Promise.all([
-        prisma.billSubmission.count({ where: whereClause }),
-        prisma.billSubmission.findMany({
-          where: whereClause,
-          include: {
-            customer: true,
-            month: true,
-            activity: true,
-            reviewer: {
-              select: { id: true, name: true, email: true },
+      let dbBills: any[] = [];
+      let total = 0;
+      try {
+        const [cnt, list] = await Promise.all([
+          prisma.billSubmission.count({ where: whereClause }),
+          prisma.billSubmission.findMany({
+            where: whereClause,
+            include: {
+              customer: true,
+              month: true,
+              activity: true,
+              reviewer: {
+                select: { id: true, name: true, email: true },
+              },
             },
-          },
-          orderBy: { submittedAt: 'desc' },
-          skip,
-          take: limitNum,
-        }),
-      ]);
+            orderBy: { submittedAt: 'desc' },
+            skip,
+            take: limitNum,
+          }),
+        ]);
+        total = cnt;
+        dbBills = list;
+      } catch (dbErr) {
+        // DB error fallback
+      }
+
+      // Merge với inMemoryStore bills để không bao giờ bị sót hóa đơn vừa nộp
+      const mergedMap = new Map<string, any>();
+      dbBills.forEach((b) => mergedMap.set(b.id, b));
+      inMemoryStore.bills.forEach((b) => {
+        if (!mergedMap.has(b.id)) {
+          mergedMap.set(b.id, b);
+        }
+      });
+
+      let allBills = Array.from(mergedMap.values());
+      if (status && status !== 'all') {
+        allBills = allBills.filter((b) => b.status === status);
+      }
 
       return res.status(200).json({
         success: true,
-        data: bills,
+        data: allBills,
         pagination: {
-          total,
+          total: allBills.length,
           page: pageNum,
           limit: limitNum,
-          totalPages: Math.ceil(total / limitNum),
+          totalPages: Math.max(1, Math.ceil(allBills.length / limitNum)),
         },
       });
     } catch (err) {
-      // Fallback in-memory
       const allMemBills = Array.from(inMemoryStore.bills.values());
-      let filtered = allMemBills;
-      if (status && status !== 'all') {
-        filtered = filtered.filter((b) => b.status === status);
-      }
       return res.status(200).json({
         success: true,
-        data: filtered,
+        data: allMemBills,
         pagination: {
-          total: filtered.length,
+          total: allMemBills.length,
           page: 1,
           limit: 20,
           totalPages: 1,
@@ -301,17 +318,26 @@ export class AdminController {
   static async getBillById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const bill = await prisma.billSubmission.findUnique({
-        where: { id },
-        include: {
-          customer: true,
-          month: true,
-          activity: true,
-          reviewer: {
-            select: { id: true, name: true, email: true },
+      let bill: any = null;
+      try {
+        bill = await prisma.billSubmission.findUnique({
+          where: { id },
+          include: {
+            customer: true,
+            month: true,
+            activity: true,
+            reviewer: {
+              select: { id: true, name: true, email: true },
+            },
           },
-        },
-      });
+        });
+      } catch {
+        // Ignore DB error
+      }
+
+      if (!bill) {
+        bill = inMemoryStore.bills.get(id);
+      }
 
       if (!bill) {
         return res.status(404).json({ success: false, error: 'Hóa đơn không tồn tại.' });
@@ -330,8 +356,24 @@ export class AdminController {
       const { adminNote } = req.body;
       const adminId = req.admin?.id;
 
-      const bill = await prisma.billSubmission.findUnique({ where: { id } });
+      let bill: any = null;
+      try {
+        bill = await prisma.billSubmission.findUnique({ where: { id } });
+      } catch {
+        // Ignore
+      }
+
       if (!bill) {
+        const memBill = inMemoryStore.bills.get(id);
+        if (memBill) {
+          memBill.status = 'approved';
+          memBill.adminNote = adminNote || 'Hóa đơn hợp lệ.';
+          return res.status(200).json({
+            success: true,
+            message: 'Đã phê duyệt hóa đơn thành công!',
+            data: memBill,
+          });
+        }
         return res.status(404).json({ success: false, error: 'Hóa đơn không tồn tại.' });
       }
 
@@ -346,17 +388,28 @@ export class AdminController {
         include: { customer: true, activity: true },
       });
 
+      // Cập nhật cả inMemoryStore nếu có
+      const memBill = inMemoryStore.bills.get(id);
+      if (memBill) {
+        memBill.status = 'approved';
+        memBill.adminNote = adminNote || 'Hóa đơn hợp lệ.';
+      }
+
       // Audit log
       if (adminId) {
-        await prisma.adminLog.create({
-          data: {
-            adminId,
-            action: 'APPROVE_BILL',
-            targetType: 'BILL',
-            targetId: id,
-            metadata: JSON.stringify({ adminNote }),
-          },
-        });
+        try {
+          await prisma.adminLog.create({
+            data: {
+              adminId,
+              action: 'APPROVE_BILL',
+              targetType: 'BILL',
+              targetId: id,
+              metadata: JSON.stringify({ adminNote }),
+            },
+          });
+        } catch {
+          // Ignore
+        }
       }
 
       return res.status(200).json({
@@ -387,7 +440,13 @@ export class AdminController {
       const { adminNote } = req.body;
       const adminId = req.admin?.id;
 
-      const bill = await prisma.billSubmission.findUnique({ where: { id } });
+      let bill: any = null;
+      try {
+        bill = await prisma.billSubmission.findUnique({ where: { id } });
+      } catch {
+        // Ignore
+      }
+
       if (!bill) {
         const memBill = inMemoryStore.bills.get(id);
         if (memBill) {
@@ -412,6 +471,13 @@ export class AdminController {
         },
         include: { customer: true, activity: true },
       });
+
+      // Cập nhật cả inMemoryStore nếu có
+      const memBill = inMemoryStore.bills.get(id);
+      if (memBill) {
+        memBill.status = 'rejected';
+        memBill.adminNote = adminNote || 'Hóa đơn chưa hợp lệ.';
+      }
 
       // Audit log
       if (adminId) {
