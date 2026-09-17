@@ -83,9 +83,20 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// Gắn Router
-app.use('/api', customerRoutes);
+// Chuẩn hóa URL nếu client gửi thừa tiền tố /api/api
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  if (req.url.startsWith('/api/api/')) {
+    req.url = req.url.replace(/^\/api\/api\//, '/api/');
+  }
+  next();
+});
+
+// Gắn Router: Hỗ trợ cả /api và không có /api để tương thích mọi cấu hình VITE_API_URL
 app.use('/api/admin', adminRoutes);
+app.use('/api', customerRoutes);
+
+app.use('/admin', adminRoutes);
+app.use('/', customerRoutes);
 
 // Xử lý Route không tồn tại (404)
 app.use((_req: Request, res: Response) => {

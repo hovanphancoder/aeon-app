@@ -1,7 +1,8 @@
 // API Client cho Admin Dashboard
-const API_BASE_URL = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api/admin` 
-  : '/api/admin';
+// Tự động chuẩn hóa VITE_API_URL để tránh bị lặp '/api/admin' hoặc thừa '/api'
+const rawAdminUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+const cleanAdminOrigin = rawAdminUrl.replace(/\/api\/admin$|\/api$|\/admin$/, '');
+const API_BASE_URL = cleanAdminOrigin ? `${cleanAdminOrigin}/api/admin` : '/api/admin';
 
 export class ApiError extends Error {
   constructor(public message: string, public status?: number, public data?: any) {

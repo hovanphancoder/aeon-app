@@ -1,7 +1,8 @@
 // API Client linh hoạt cho Customer Web
-// Tự động sử dụng relative path '/api' (qua Vite proxy hoặc Nginx) nếu chưa có VITE_API_URL
-const API_BASE_URL = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api` 
+// Tự động chuẩn hóa VITE_API_URL để tránh bị lặp '/api/api' hoặc thiếu '/api'
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+const API_BASE_URL = rawApiUrl 
+  ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`) 
   : '/api';
 
 export class ApiError extends Error {
