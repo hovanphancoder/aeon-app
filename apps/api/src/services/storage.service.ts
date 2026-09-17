@@ -40,7 +40,11 @@ export class LocalStorageService implements IStorageService {
     // Lưu buffer vào file system
     await fs.promises.writeFile(targetPath, file.buffer);
 
-    // Trả về đường dẫn truy cập công khai
+    // Nếu chạy Vercel, trả về URL tạm
+    if (process.env.VERCEL) {
+      return `/uploads/bills/${filename}`;
+    }
+
     return `${config.storage.publicUrl}/bills/${filename}`;
   }
 
