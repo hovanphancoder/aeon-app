@@ -20,8 +20,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Bảng Điều Khiển', icon: LayoutDashboard },
     { id: 'bills', label: 'Duyệt Hóa Đơn', icon: Receipt, badge: pendingCount },
-    { id: 'months', label: 'Quản Lý Tháng', icon: Calendar },
-    { id: 'activities', label: 'Quản Lý Hoạt Động', icon: Gift },
+    // Tạm thời ẩn chức năng Quản Lý Tháng và Quản Lý Hoạt Động theo yêu cầu
+    // { id: 'months', label: 'Quản Lý Tháng', icon: Calendar },
+    // { id: 'activities', label: 'Quản Lý Hoạt Động', icon: Gift },
     { id: 'customers', label: 'Khách Hàng', icon: Users },
     { id: 'settings', label: 'Cài Đặt Thể Lệ', icon: Settings },
   ];

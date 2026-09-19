@@ -17,6 +17,13 @@ export const App: React.FC = () => {
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
+  // Tự động chuyển về dashboard nếu tab hiện tại là tháng hoặc hoạt động đang tạm ẩn
+  useEffect(() => {
+    if (activeTab === 'months' || activeTab === 'activities') {
+      setActiveTab('dashboard');
+    }
+  }, [activeTab]);
+
   // Thăm dò số lượng bill chờ duyệt để hiển thị badge đỏ
   useEffect(() => {
     if (isAuthenticated) {
